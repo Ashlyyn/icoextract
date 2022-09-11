@@ -1,7 +1,10 @@
-use std::{ptr::{slice_from_raw_parts, addr_of}, ffi::{CStr, c_char}};
+use std::{
+    ffi::{c_char, CStr},
+    ptr::{addr_of, slice_from_raw_parts},
+};
 
 use num_derive::{FromPrimitive, ToPrimitive};
-use utf16string::{WString, LittleEndian};
+use utf16string::{LittleEndian, WString};
 
 #[repr(u16)]
 #[allow(dead_code)]
@@ -167,7 +170,12 @@ pub struct SectionHeader {
 
 impl From<SectionHeaderRaw> for SectionHeader {
     fn from(raw: SectionHeaderRaw) -> Self {
-        let name = unsafe { CStr::from_ptr(raw.name.as_ptr() as *const c_char).to_str().unwrap().to_owned() };
+        let name = unsafe {
+            CStr::from_ptr(raw.name.as_ptr() as *const c_char)
+                .to_str()
+                .unwrap()
+                .to_owned()
+        };
         Self {
             name,
             virtual_size: raw.virtual_size as usize,
@@ -178,7 +186,7 @@ impl From<SectionHeaderRaw> for SectionHeader {
             line_numbers_offset: raw.line_numbers_offset as usize,
             num_relocations: raw.num_relocations.into(),
             num_line_numbers: raw.num_line_numbers.into(),
-            characteristics: raw.characteristics.into()
+            characteristics: raw.characteristics.into(),
         }
     }
 }
@@ -193,7 +201,7 @@ pub struct ResourceDirectoryEntryRaw {
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum ResourceDirectoryEntryOffsetType {
     Stem(i32),
-    Leaf(i32)
+    Leaf(i32),
 }
 
 impl From<i32> for ResourceDirectoryEntryOffsetType {
@@ -208,28 +216,25 @@ impl From<i32> for ResourceDirectoryEntryOffsetType {
 
 pub struct ResourceDirectoryEntry {
     pub entry: u16,
-    pub data_type: ResourceDirectoryEntryDataType
+    pub data_type: ResourceDirectoryEntryDataType,
 }
 
 impl ResourceDirectoryEntry {
     pub fn new(entry: u16, data_type: ResourceDirectoryEntryDataType) -> Self {
-        Self {
-            entry,
-            data_type
-        }
+        Self { entry, data_type }
     }
 }
 
 #[derive(Debug, PartialEq)]
 pub enum ResourceDirectoryEntryDataType {
     Id(u32, ResourceDirectoryEntryOffsetType),
-    Named(WString<LittleEndian>, ResourceDirectoryEntryOffsetType)
+    Named(WString<LittleEndian>, ResourceDirectoryEntryOffsetType),
 }
 
 #[repr(C, packed)]
 pub struct ResourceDirectoryStringRaw {
     pub len: u16,
-    pub bytes: [u16]
+    pub bytes: [u16],
 }
 
 #[allow(dead_code)]
@@ -261,11 +266,15 @@ pub struct ResourceDataEntry {
 }
 
 impl ResourceDataEntry {
-    pub fn from_raw(section_header: &SectionHeader, raw: ResourceDataEntryRaw) -> Self {
+    pub fn from_raw(
+        section_header: &SectionHeader,
+        raw: ResourceDataEntryRaw,
+    ) -> Self {
         Self {
-            offset: raw.rva as usize - section_header.virtual_address + section_header.raw_data_offset,
+            offset: raw.rva as usize - section_header.virtual_address
+                + section_header.raw_data_offset,
             size: raw.size as usize,
-            codepage: raw.codepage
+            codepage: raw.codepage,
         }
     }
 }
@@ -300,7 +309,7 @@ pub struct ResourceDirectory {
     pub major_version: u16,
     pub minor_version: u16,
     pub num_named_entries: u16,
-    pub num_id_entries: u16
+    pub num_id_entries: u16,
 }
 
 impl From<ResourceDirectoryRaw> for ResourceDirectory {
@@ -311,21 +320,28 @@ impl From<ResourceDirectoryRaw> for ResourceDirectory {
             major_version: raw.major_version,
             minor_version: raw.minor_version,
             num_named_entries: raw.num_named_entries,
-            num_id_entries: raw.num_id_entries
+            num_id_entries: raw.num_id_entries,
         }
     }
 }
 
 impl ResourceDirectory {
     #[allow(dead_code)]
-    pub fn new(characteristics: u32, time_date_stamp: u32, major_version: u16, minor_version: u16, num_named_entries: u16, num_id_entries: u16) -> Self {
+    pub fn new(
+        characteristics: u32,
+        time_date_stamp: u32,
+        major_version: u16,
+        minor_version: u16,
+        num_named_entries: u16,
+        num_id_entries: u16,
+    ) -> Self {
         Self {
             characteristics,
             time_date_stamp,
             major_version,
             minor_version,
             num_named_entries,
-            num_id_entries
+            num_id_entries,
         }
     }
 }
