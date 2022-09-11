@@ -1,5 +1,7 @@
 #![feature(slice_ptr_get)]
 
+pub extern crate self as icoextract;
+
 use core::panic;
 use std::cmp::Reverse;
 use std::ffi::CStr;
