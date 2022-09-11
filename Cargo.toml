@@ -1,6 +1,6 @@
 [package]
 name = "icoextract"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "Simple library to extract icons from a Windows executable (PE32 and PE32+). Very barebones, do not use in anything important yet."
 license = "Unlicense"
